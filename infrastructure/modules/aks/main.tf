@@ -1,31 +1,39 @@
-resource "azurerm_kubernetes_cluster" "main" {
-  name                = "${var.prefix}-aks-${var.environment}"
-  location            = var.location
-  resource_group_name = var.resource_group_name
-  dns_prefix          = "${var.prefix}-aks-${var.environment}"
+terraform {
+  required_providers {
+    azurerm = {
+      source  = "hashicorp/azurerm"
+      version = "~>3.0"
+    }
+  }
+  required_version = ">= 1.3.0"
+}
+
+
+# Define resource group
+resource "azurerm_resource_group" "aks_rg" {
+  name     = "${var.labelPrefix}-h09-rg"
+  location = var.region
+}
+
+resource "azurerm_kubernetes_cluster" "aks" {
+  name                = "${var.labelPrefix}-k8s"
+  location            = azurerm_resource_group.aks_rg.location
+  resource_group_name = azurerm_resource_group.aks_rg.name
+  dns_prefix          = "${var.labelPrefix}-k8s"
 
   default_node_pool {
-    name           = "default"
-    node_count     = var.environment == "test" ? 1 : var.node_count
-    vm_size        = "Standard_B2s"
-    vnet_subnet_id = var.subnet_id
-    //enable_auto_scaling = true
+    name                = "systempool"
+    node_count          = 1
+    min_count           = 1
+    max_count           = 3
+    vm_size             = "Standard_B2s"
+    enable_auto_scaling = true
   }
 
   identity {
     type = "SystemAssigned"
   }
 
-
-  network_profile {
-    network_plugin = "azure"
-    service_cidr   = "10.240.0.0/16"
-    dns_service_ip = "10.240.0.10"
-  }
-
-
-
-  tags               = var.tags
-  kubernetes_version = "1.31.5"
-
+  kubernetes_version = "1.32.0"
 }
+
