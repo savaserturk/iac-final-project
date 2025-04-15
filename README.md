@@ -91,7 +91,10 @@ These workflows ensure full automation from code commit to cloud deployment.
 ![Kubectl Output](images/kubectl-svc.png)
 
 ### 🖥️ Redis Deployment on Azure
-![Kubectl Output](images/redis.png)
+![Redis Deployment](images/redis.png)
+
+### 🖥️ Github Actions
+![Github Actions](images/gitactions.png)
 
 ## 📸 Submission Checklist
 
