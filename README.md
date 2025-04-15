@@ -90,6 +90,9 @@ These workflows ensure full automation from code commit to cloud deployment.
 ### 🖥️ Kubernetes Services via Terminal
 ![Kubectl Output](images/kubectl-svc.png)
 
+### 🖥️ Redis Deployment on Azure
+![Kubectl Output](images/redis.png)
+
 ## 📸 Submission Checklist
 
 - [x] GitHub repo submitted on Brightspace
