@@ -1,0 +1,38 @@
+name: Build & Push Remix Docker Image
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+jobs:
+  docker-build-push:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Log in to Test ACR
+        if: github.event_name == 'pull_request'
+        run: echo "${{ secrets.TEST_ACR_PASSWORD }}" | docker login testacr7wdj.azurecr.io -u ${{ secrets.TEST_ACR_USERNAME }} --password-stdin
+
+      - name: Log in to Prod ACR
+        if: github.event_name == 'push'
+        run: echo "${{ secrets.PROD_ACR_PASSWORD }}" | docker login prodacrji4x.azurecr.io -u ${{ secrets.PROD_ACR_USERNAME }} --password-stdin
+
+      - name: Build Docker image
+        run: docker build -t remix-weather:${{ github.sha }} remix-weather-final/remix-weather-final
+
+      - name: Tag and Push to Test ACR
+        if: github.event_name == 'pull_request'
+        run: |
+          docker tag remix-weather:${{ github.sha }} testacr7wdj.azurecr.io/remix-weather:${{ github.sha }}
+          docker push testacr7wdj.azurecr.io/remix-weather:${{ github.sha }}
+
+      - name: Tag and Push to Prod ACR
+        if: github.event_name == 'push'
+        run: |
+          docker tag remix-weather:${{ github.sha }} prodacrji4x.azurecr.io/remix-weather:${{ github.sha }}
+          docker push prodacrji4x.azurecr.io/remix-weather:${{ github.sha }}

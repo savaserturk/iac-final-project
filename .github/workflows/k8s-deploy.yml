@@ -1,0 +1,52 @@
+name: Deploy to AKS
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+
+permissions:
+  id-token: write
+  contents: read
+  pull-requests: write
+
+env:
+  AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+  AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+  AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Azure Login with OIDC
+        uses: azure/login@v1
+        with:
+          client-id: ${{ env.AZURE_CLIENT_ID }}
+          tenant-id: ${{ env.AZURE_TENANT_ID }}
+          subscription-id: ${{ env.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Set Kubernetes context
+        uses: azure/aks-set-context@v3
+        with:
+          resource-group: ${{ github.ref == 'refs/heads/main' && 'prod-h09-rg' || 'test-h09-rg' }}
+          cluster-name: ${{ github.ref == 'refs/heads/main' && 'prod-k8s' || 'test-k8s' }}
+
+      - name: Apply Deployment and Service YAMLs
+        run: |
+          kubectl apply -f remix-weather-final/remix-weather-final/k8s/deployment.yaml
+          kubectl apply -f remix-weather-final/remix-weather-final/k8s/service.yaml
+
+      - name: Deploy to AKS (test or prod)
+        run: |
+          DEPLOYMENT_NAME=${{ github.ref == 'refs/heads/main' && 'prod-remix' || 'test-remix' }}
+          ACR_NAME=${{ github.ref == 'refs/heads/main' && 'prodacrji4x.azurecr.io' || 'testacr7wdj.azurecr.io' }}
+          kubectl set image deployment/remix remix=$ACR_NAME/remix-weather:${{ github.sha }} --namespace=default
+
+      - name: Wait for Deployment Rollout
+        run: |
+          kubectl rollout status deployment/remix --namespace=default || kubectl rollout undo deployment/remix --namespace=default

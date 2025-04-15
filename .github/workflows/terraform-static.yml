@@ -1,0 +1,32 @@
+name: Terraform Static Code Checks
+
+on:
+  push:
+    branches:
+      - "**"
+
+jobs:
+  static-checks:
+    name: Terraform Format, Validate, and tfsec
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.5.7
+
+      - name: Terraform Init
+        run: terraform init
+
+      - name: Terraform Format Check
+        run: terraform fmt -check -recursive
+
+      - name: Terraform Validate
+        run: terraform validate
+
+    #   - name: Run tfsec (Security Scanner)
+    #     uses: aquasecurity/tfsec-action@v1.0.0

@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: prod-remix
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: remix
+  template:
+    metadata:
+      labels:
+        app: remix
+    spec:
+      containers:
+      - name: remix
+        image: prodacrji4x.azurecr.io/remix-weather:latest
+        ports:
+        - containerPort: 3000
