@@ -4,10 +4,10 @@ This project demonstrates Infrastructure as Code (IaC) using Terraform to deploy
 
 ## Team Members
 
-- Savas Erturk(GitHub: [your-github-username])
-- Rohan James Scott(GitHub: [their-github-username])
-- Khanh Duy Truong (GitHub: [their-github-username])
-- Ben Yee GitHub: BenYee15
+- Savas Erturk (GitHub: savaserturk])
+- Rohan James Scott (GitHub: scot8)
+- Khanh Duy Truong (GitHub: duytk1)
+- Ben Yee GitHub: (GitHub: BenYee15)
 
 ## Prerequisites
 
