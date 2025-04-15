@@ -1,3 +1,4 @@
+# amending original commit message which replacing aws and ec2 with aks cluster
 terraform {
   required_providers {
     kubernetes = {
